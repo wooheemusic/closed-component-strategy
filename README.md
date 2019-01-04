@@ -23,6 +23,7 @@
 (It also improves readability and manageability.)
 * All *major* components should be *closed*.
 (The reason why major and model components are separated is to escape state comparison)
+* The state of a *model* component should not have a property referring to only viewing.
 * All *view* components should be *closed*.
 * All *page* components should be *closed*.
 
