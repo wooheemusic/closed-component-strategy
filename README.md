@@ -1,5 +1,5 @@
 # closed-component-strategy
-* It is a strategy on update in a React app by organizing components in a certain way.
+* It is a strategy on composition in a React app by organizing components in a certain way.
 * It provides breaking points of composition hierarchy.
 
 # Prerequisite
