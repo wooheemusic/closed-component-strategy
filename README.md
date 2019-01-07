@@ -27,7 +27,7 @@
 * All *view* components should be *closed*.
 * All *page* components should be *closed*.
 
-# samples of a major component
+# Samples of a major component
 ```
 class Sample extends PureComponent {
     …
@@ -43,8 +43,12 @@ memo(()=> <SampleModel> … </SampleModel> );
 ```
 or you can use 'render props’ or ‘hoc’ pattern complying with the strategy.
 
-# examples
+# Examples
 not yet;
+
+# Version
+- v1.0.0
+- purposes, pros and cons, and examples will be updated
 
 # LICENCE
 MIT © [wooheemusic](https://github.com/wooheemusic)
