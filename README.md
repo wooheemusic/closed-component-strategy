@@ -21,7 +21,7 @@
 * A *closed* component renders all its sub-components by the composite pattern as much as possible.
 (It enables props subscriptions by closure so your app escapes props-passing hell without contexts.)
 (It also improves readability and manageability.)
-* A file of a component does not export a HOC-wrapped component. All HOC declarations should be placed in closed components.
+* A component js/jsx file should not export a HOC-wrapped component. All HOC declarations should be placed in closed components.
 * All *major* components should be *closed*.
 (The reason why *major* and *model* components are separated is to escape state comparison)
 * The state of a *model* component should not have a property referring to only viewing.
