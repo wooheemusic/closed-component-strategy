@@ -17,7 +17,7 @@
 # Rules
 * All *closed* components should be pure or memoized components. 
 (they escape creations of react elements and reconciliations, but their props comparisons are trade-offs)
-(All *closed* components should throw an error in dev mode if it receives a children prop)
+(every *closed* component should throw an error in dev mode if it receives a children prop)
 * A *closed* component renders all its sub-components by the composite pattern as much as possible.
 (It enables props subscriptions by closure so your app escapes props-passing hell without contexts.)
 (It also improves readability and manageability.)
