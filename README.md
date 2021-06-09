@@ -1,56 +1,87 @@
-# closed-component-strategy
-* It is a strategy on composition in a React app by organizing components in a certain way.
-* It provides breaking points of composition hierarchy.
+# **Closed Component Strategy**
 
-# Prerequisite
-* solid understanding of the react doc (https://reactjs.org/docs)
-* the observer pattern (https://en.wikipedia.org/wiki/Observer_pattern)
+ This page introduces  some conventions to use the containment pattern with React.Purecomponent or React.memo.
 
-# Glossary
-* A *closed* component is a stateless && infertile(disallowing props.children) component. (open to the rest of props)
-* A *major* component is a component that renders a model and views.
-* A *model* component is a component that covers state of logic.
-* A *view* component is a component that is only the closest(might not be immediate) viewing child of a model component. (a model may render a view-model).
-* A *view-model* component is a component that covers state of view.
-* A *page* component is a component that is an immediate child routed by a distinct pathname.
+  The containment pattern is one of composition patterns in JSX. It is recommended because it  visually structuralizes codes to enhence readability and provides criteria for componentizing.
 
-# Rules
-* All *closed* components should be pure or memoized components. 
-(they escape creations of react elements and reconciliations, but their props comparisons are trade-offs)
-(every *closed* component should throw an error in dev mode if it receives a children prop)
-* A *closed* component renders all its sub-components by the composite pattern as much as possible.
-(It enables props subscriptions by closure so your app escapes props-passing hell without contexts.)
-(It also improves readability and manageability.)
-* A component js/jsx file should not export a HOC-wrapped component. All HOC declarations should be placed in closed components.
-* All *major* components should be *closed*.
-(The reason why *major* and *model* components are separated is to escape state comparison)
-* The state of a *model* component should not have a property referring to only viewing.
-* All *view* components should be *closed*.
-* All *page* components should be *closed*.
-
-# Samples of a major component
+## **glossary**
+### **open component**
+- It is receiving tangible props.children from parents.
+- It is instantiated by opening and closing tags. 
 ```
-class Sample extends PureComponent {
-    …
-    render() {
-        return <SampleModel><SampleViewOrViewController /></SampleModel> // return React.cloneElement(this.props.children, this.state);
-        // or return <SampleModel>{ state => <SampleViewOrViewController {…state} /> }</SampleModel> // render() { return this.props.children(this.state)}
-    }
-}
+<div>
+    <OpenComponent>
+        <AnyChild />
+    </OpenComponent>
+    <OtherComponent />
+</div>
 ```
-or 
+- Its parent rendering always executes its render method.
+- React.PureComponent or React.memo will not work. It is too expensive to compare old children and new children to enable render-escape.
+
+### **closed component**
+- It is not an open Component.
+- It is instantiated by self-closing.
 ```
-memo(()=> <SampleModel> … </SampleModel> );
+<div>
+    <ClosedComponent />
+    <OtherComponent />
+</div>
 ```
-or you can use 'render props’ or ‘hoc’ pattern complying with the strategy.
 
-# Examples
-not yet;
+### **mutable component**
+- It renders by `setState`, `context` changes, mutable `props` or `redux` actions.
+### **immutable component**
+- not a mutable component. 
 
-# Version
-- v1.0.0
-- purposes, pros and cons, and examples will be updated
+>These types of component are not determined in their component definitions. They are determined in render methods of their parents.
 
-# LICENCE
-MIT © [wooheemusic](https://github.com/wooheemusic)
+## **strategy**
 
+- Immutable components may have any types of component in their render methods. 
+- **Mutable components may not have open and expensive components with a set of jsx react elements, which is not props.children, in their render methods.** Or the open components will never be protected in updating with React.memo or React.PureComponent. 
+- You could regard merely-mutable as immutable.
+- If you have a component with state changes but no props changes, but you want to use open components, you can just create a new component class or function encapsulizing its state part.
+
+## **an appropriate form of mutable components**
+It has zero or more parallelized closed components and zero or one open component with {this.props.children}
+```
+() => (
+    <div>
+        <ClosedComponent1/>
+        <ClosedComponent2/>
+        <ClosedComponent3/>
+        <OpenComponent>
+            {this.props.children}
+        </OpenComponent>
+    </div>
+)
+```
+## **an inappropriate form of mutable components**
+
+```
+() => (
+    <div>
+        <OpenComponent1>
+            <ClosedCompoent1 />
+        <Opencomponent/>
+)
+```
+
+## **why?**
+- Render methods always create new react elements with any jsx codes except codes for persisted objects.
+- A mutable parent component disables React.memo or React.PureComponent of its open child components by creating new `props.children`.
+- A pure component embraced in a child component and instantiated in a parent component defends itself from the changes in the child component because the child component uses the same persisted `props.children`.
+
+## **sample**
+The sample will help you to understand the strategy
+```
+git clone ~~~~
+```
+and
+```
+npm start
+``` 
+- This sample code does not fit the react official documentation. It is just for test.
+- `React.StrictMode` is disabled for test.
+- I did not use class components, `this` and `WeakMap`, but just `Map` and `props.name` to generate private references.
