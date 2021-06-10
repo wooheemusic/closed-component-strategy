@@ -62,8 +62,8 @@ It has zero or more parallelized closed components and zero or one open componen
 ```
 () => (
     <div>
-        <OpenComponent1>
-            <ClosedCompoent1 />
+        <OpenComponent>
+            <ClosedCompoent />
         <Opencomponent/>
 )
 ```
@@ -76,10 +76,9 @@ It has zero or more parallelized closed components and zero or one open componen
 ## **sample**
 The sample will help you to understand the strategy
 ```
-git clone ~~~~
-```
-and
-```
+git clone git@github.com:wooheemusic/closed-component-strategy.git
+cd closed-component-strategy
+npm install
 npm start
 ``` 
 - This sample code does not fit the react official documentation. It is just for test.
