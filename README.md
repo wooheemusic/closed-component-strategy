@@ -62,6 +62,34 @@ export default function Parent() {
 (React DevTool will use the name Child, not MemoizedChild.)
 
 - **Mutable components may not have expensive open components with a set of jsx react elements as children, which is not {props.children}, in their render methods.** Or the open components will never be protected by React.memo or React.PureComponent in updating. 
+
+```
+// in a mutable component
+
+// good
+
+<Any />
+<CheapOpenComponent>
+    <Cheap />
+</CheapOpenComponent>
+<ExpensiveClosedComponent />
+<ExpensiveOpenComponent>
+    {this.props.children}
+</ExpensiveOpenComponent>
+
+// bad
+
+<Any />
+<CheapOpenComponent>
+    <Cheap />
+</CheapOpenComponent>
+<ExpensiveClosedComponent />
+<ExpensiveOpenComponent>
+    <EvenClosedPureComponent />
+<ExpensiveOpencomponent/>
+```
+
+
 - You could regard merely-mutable as immutable.
 - If you have a stateful component with no props changes, you can make it immutable by encapsuliz its state part.
 ```
@@ -95,31 +123,6 @@ function ImmutableComponent() {
 }
 ```
 
-
-## **an appropriate form of mutable components**
-It has zero or more parallelized closed components and zero or one open component with {this.props.children}
-```
-() => (
-    <div>
-        <ClosedComponent1/>
-        <ClosedComponent2/>
-        <ClosedComponent3/>
-        <ExpensiveOpenComponent>
-            {this.props.children}
-        </ExpensiveOpenComponent>
-    </div>
-)
-```
-## **an inappropriate form of mutable components**
-
-```
-() => (
-    <div>
-        <ExpensiveOpenComponent>
-            <ClosedComponent />
-        <ExpensiveOpencomponent/>
-)
-```
 
 ## **why?**
 - Render methods always create new react elements with any jsx codes except codes for persisted objects.
