@@ -11,13 +11,13 @@
 ```
 <div>
     <OpenComponent>
-        <AnyChild />
+        <AnyChild value={value} />
     </OpenComponent>
     <OtherComponent />
 </div>
 ```
-- Its parent rendering always executes its render method.
-- React.PureComponent or React.memo will not work. It is too expensive to compare old children and new children to enable render-escape.
+- Its parent rendering always causes its render method execution.
+- React.PureComponent or React.memo in an open component will not work even without the value changed. And it is too expensive that OpenComponent checks children changes to children prop's props to make itself memoized.
 
 ### **closed component**
 - It is not an open Component.
@@ -39,9 +39,62 @@
 ## **strategy**
 
 - Immutable components may have any types of component in their render methods. 
-- **Mutable components may not have open and expensive components with a set of jsx react elements, which is not props.children, in their render methods.** Or the open components will never be protected in updating with React.memo or React.PureComponent. 
+- If a immutable component renders a big tree of components, all of its components are never needed to be memoized. You cannot determine whether each of them would be memoized or not when you first write a new component in NewComponent.js. So you have to make a component memoized when you import and instantite it as a react element.
+```
+import { useState } from 'react';
+import Child from './Child';
+
+const MemoizedChild = memo(Child);
+
+export default function Parent() {
+    const [aaa, setAaa] = useState('');
+    //...
+    
+    return (
+        <div>
+            ...
+            <MemoizedChild />
+        </div>
+    );
+}
+
+```
+(React DevTool will use the name Child, not MemoizedChild.)
+
+- **Mutable components may not have expensive open components with a set of jsx react elements as children, which is not {props.children}, in their render methods.** Or the open components will never be protected by React.memo or React.PureComponent in updating. 
 - You could regard merely-mutable as immutable.
-- If you have a component with state changes but no props changes, but you want to use open components, you can just create a new component class or function encapsulizing its state part.
+- If you have a stateful component with no props changes, you can make it immutable by encapsuliz its state part.
+```
+function StatefulWithoutPropsChanges() {
+    const [v, setV] = useState('');
+    return (
+        <>
+            <ExpensiveChildA value={v} />
+            <ExpensiveChildB>
+                <GrandChildren value={v}>
+                ... 
+            </ExpensiveChildB>
+            <ExpensiveComponentRequiringManyChildren>
+                ... a huge tree
+            </ExpensiveComponentRequiringManyChildren>
+        </>
+    )
+}
+```
+to
+```
+function ImmutableComponent() {
+    return (
+        <>
+            <EncapsulizedStateful />
+            <ExpensiveComponentRequiringManyChildren>
+                ... a huge tree
+            </ExpensiveComponentRequiringManyChildren>
+        </>
+    );
+}
+```
+
 
 ## **an appropriate form of mutable components**
 It has zero or more parallelized closed components and zero or one open component with {this.props.children}
@@ -51,9 +104,9 @@ It has zero or more parallelized closed components and zero or one open componen
         <ClosedComponent1/>
         <ClosedComponent2/>
         <ClosedComponent3/>
-        <OpenComponent>
+        <ExpensiveOpenComponent>
             {this.props.children}
-        </OpenComponent>
+        </ExpensiveOpenComponent>
     </div>
 )
 ```
@@ -62,9 +115,9 @@ It has zero or more parallelized closed components and zero or one open componen
 ```
 () => (
     <div>
-        <OpenComponent>
-            <ClosedCompoent />
-        <Opencomponent/>
+        <ExpensiveOpenComponent>
+            <ClosedComponent />
+        <ExpensiveOpencomponent/>
 )
 ```
 
