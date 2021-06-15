@@ -1,14 +1,15 @@
 # **Closed Component Strategy**
 
- This page introduces  some conventions to use the containment pattern with React.Purecomponent or React.memo.
+ This page introduces some conventions to use the containment pattern with `React.Purecomponent` or `React.memo`.
 
-  The containment pattern is one of composition patterns in JSX. It is recommended because it  visually structuralizes codes to enhence readability and provides criteria for componentizing.
+  The containment pattern is one of composition patterns in JSX. It is recommended because it visually structuralizes codes to enhence readability and provides criteria for componentizing.
 
-## **glossary**
-### **open component**
+## **Glossary**
+
+### **Open component**
 - It is receiving tangible props.children from parents.
 - It is instantiated by opening and closing tags. 
-```
+```jsx
 <div>
     <OpenComponent>
         <AnyChild value={value} />
@@ -17,30 +18,31 @@
 </div>
 ```
 - Its parent rendering always causes its render method execution.
-- React.PureComponent or React.memo in an open component will not work even without the value changed. And it is too expensive that OpenComponent checks children changes to children prop's props to make itself memoized.
+- `React.PureComponent` or `React.memo` in an open component will not work even without the value changed. And it is too expensive that `OpenComponent` checks changes from `children prop` to `children prop`'s `props` to make itself memoized.
 
-### **closed component**
+### **Closed component**
 - It is not an open Component.
 - It is instantiated by self-closing.
-```
+```jsx
 <div>
     <ClosedComponent />
     <OtherComponent />
 </div>
 ```
 
-### **mutable component**
+### **Mutable component**
 - It renders by `setState`, `context` changes, mutable `props` or `redux` actions.
-### **immutable component**
+
+### **Immutable component**
 - not a mutable component. 
 
 >These types of component are not determined in their component definitions. They are determined in render methods of their parents.
 
-## **strategy**
+## **Strategy**
 
 - Immutable components may have any types of component in their render methods. 
 - If a immutable component renders a big tree of components, all of its components are never needed to be memoized. You cannot determine whether each of them would be memoized or not when you first write a new component in NewComponent.js. So you have to make a component memoized when you import and instantite it as a react element.
-```
+```jsx
 import { useState } from 'react';
 import Child from './Child';
 
@@ -59,11 +61,9 @@ export default function Parent() {
 }
 
 ```
-(React DevTool will use the name Child, not MemoizedChild.)
-
-- **Mutable components may not have expensive open components with a set of jsx react elements as children, which is not {props.children}, in their render methods.** Or the open components will never be protected by React.memo or React.PureComponent in updating. 
-
-```
+(React DevTool will use the name `Child`, not `MemoizedChild`.)
+- **Mutable components may not have expensive open components with a set of jsx react elements as children, which is not `{props.children}`, in their render methods.** Or the open components will never be protected by `React.memo` or `React.PureComponent` in updating. 
+```jsx
 // in a mutable component
 
 // good
@@ -88,11 +88,9 @@ export default function Parent() {
     <EvenClosedPureComponent />
 <ExpensiveOpencomponent/>
 ```
-
-
 - You could regard merely-mutable as immutable.
 - If you have a stateful component with no props changes, you can make it immutable by encapsuliz its state part.
-```
+```jsx
 function StatefulWithoutPropsChanges() {
     const [v, setV] = useState('');
     return (
@@ -110,7 +108,7 @@ function StatefulWithoutPropsChanges() {
 }
 ```
 to
-```
+```jsx
 function ImmutableComponent() {
     return (
         <>
@@ -123,19 +121,20 @@ function ImmutableComponent() {
 }
 ```
 
+## **Why?**
 
-## **why?**
 - Render methods always create new react elements with any jsx codes except codes for persisted objects.
 - A mutable parent component disables React.memo or React.PureComponent of its open child components by creating new `props.children`.
 - A pure component embraced in a child component and instantiated in a parent component defends itself from the changes in the child component because the child component uses the same persisted `props.children`.
 
-## **sample**
+## **Sample**
+
 The sample will help you to understand the strategy
-```
-git clone git@github.com:wooheemusic/closed-component-strategy.git
-cd closed-component-strategy
-npm install
-npm start
+```bash
+$ git clone git@github.com:wooheemusic/closed-component-strategy.git
+$ cd closed-component-strategy
+$ npm install
+$ npm start
 ``` 
 - This sample code does not fit the react official documentation. It is just for test.
 - `React.StrictMode` is disabled for test.
