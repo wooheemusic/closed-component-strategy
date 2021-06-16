@@ -62,7 +62,7 @@ export default function Parent() {
 
 ```
 (React DevTool will use the name `Child`, not `MemoizedChild`.)
-- **Mutable components may not have expensive open components with a set of jsx react elements as children, which is not `{props.children}`, in their render methods.** Or the open components will never be protected by `React.memo` or `React.PureComponent` in updating. 
+- **Mutable components may not have expensive open components with a set of jsx react elements as children, which is not `{props.children}`, in their render methods.** Or memoize them.
 ```jsx
 // in a mutable component
 
@@ -87,6 +87,27 @@ export default function Parent() {
 <ExpensiveOpenComponent>
     <EvenClosedPureComponent />
 <ExpensiveOpencomponent/>
+
+// alternative for functional components
+
+const memoizedReactElement = useMemo(() =><EvenClosedPureComponent a={a} b={b} c={c} />, [a, b, c] )
+
+// alternative for class components
+
+import memoizeOne from 'memoize-one';
+const memoized = memoizeOne((a, b, c) => <EvenClosedPureComponent a={a} b={b} c={c}/>) // not in its component
+
+const memoizedReactElement = memoized(a, b, c); // in its render
+
+<Any />
+<CheapOpenComponent>
+    <Cheap />
+</CheapOpenComponent>
+<ExpensiveClosedComponent />
+<ExpensiveOpenComponent>
+    {memoizedReactElement}
+<ExpensiveOpencomponent/>
+
 ```
 - You could regard merely-mutable as immutable.
 - If you have a stateful component with no props changes, you can make it immutable by encapsuliz its state part.
@@ -130,7 +151,7 @@ function ImmutableComponent() {
 ## **Sample**
 
 The sample will help you to understand the strategy
-```bash
+```sh
 $ git clone git@github.com:wooheemusic/closed-component-strategy.git
 $ cd closed-component-strategy
 $ npm install
